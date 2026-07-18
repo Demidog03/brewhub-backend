@@ -11,6 +11,18 @@ export interface AuthResult {
   token: string
 }
 
+export async function getMe(userId: string): Promise<PublicUser> {
+  const user = await db.query.users.findFirst({
+    where: eq(users.id, userId),
+  })
+
+  if (!user) {
+    throw new HTTPException(404, { message: 'User not found' })
+  }
+
+  return toPublicUser(user)
+}
+
 export async function register(input: RegisterInput): Promise<AuthResult> {
   const existing = await db.query.users.findFirst({
     where: eq(users.email, input.email),
